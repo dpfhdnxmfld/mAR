@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <WebView android:id="@+id/webview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <Button
+            android:text="Bring"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_x="260dp"
+            android:layout_y="8dp"
+            android:id="@+id/button" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_x="21dp"
+            android:layout_y="579dp"
+            android:id="@+id/Text1" />
+
+        <Button
+            android:text="Verify"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_x="260dp"
+            android:layout_y="70dp"
+            android:id="@+id/button2"
+            android:onClick="ClickI"
+            />
+    </WebView>
+</LinearLayout>

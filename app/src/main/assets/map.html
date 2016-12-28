@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Geolocation</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+       #panel {
+        position: absolute;
+        top: 5px;
+        left: 50%;
+        margin-left: -180px;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+      }
+    </style>
+
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true"></script>
+    <script>
+var map;
+var pos;
+var marker;
+var starbuckslatlng;
+var kfclatlng;
+var geocoder;
+function initialize() {
+  var mapOptions = {
+    zoom: 15
+  };
+  var curLat;
+  var curLng;
+  geocoder = new google.maps.Geocoder();
+  map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
+  if(navigator.geolocation) {
+     navigator.geolocation.getCurrentPosition(function(position) {
+         curLat=position.coords.latitude;
+         curLng=position.coords.longitude;
+
+         alert("My location is\nlatitude:"+curLat+"\nlongitude:"+curLng);
+         pos = new google.maps.LatLng(curLat,curLng);
+         marker = new google.maps.Marker({
+             map: map,
+            //animation: google.maps.Animation.BOUNCE,
+            position: pos
+        });
+        map.setCenter(pos);
+        reverseGeocode(curLat,curLng);
+     }, function() {
+      handleNoGeolocation(true);
+    });
+
+
+  } else {
+
+    handleNoGeolocation(false);
+  }
+  addItem();
+}
+function reverseGeocode(relat,relng){   //for reverse Geocoding
+
+    var regeocoder = new google.maps.Geocoder();
+    var relatlng=new google.maps.LatLng(relat,relng);
+    var info = new google.maps.InfoWindow({
+        map: map,
+        position: relatlng
+      });
+
+
+    regeocoder.geocode({ 'latLng': relatlng}, function(results, status){
+        if(status == google.maps.GeocoderStatus.OK){
+
+            if(results[1]){
+                info.setContent(results[1].formatted_address);
+                info.open(map,marker);
+            }else{
+                alert("Geocoder failed due to:"+status);
+            }
+        }
+    });
+
+}
+function addItem(){    //for add Item(overlay)
+
+    starbuckslatlng=new google.maps.LatLng(35.218,128.6);
+    kfclatlng=new google.maps.LatLng(35.215,128.6);
+    starbucksMap=new google.maps.Marker({
+        position:starbuckslatlng,
+        icon:'starbucks.jpg',
+        map:map
+    });
+
+    kfcMap=new google.maps.Marker({
+        position:kfclatlng,
+        icon:'kfc.jpg',
+        map:map
+    });
+
+
+    google.maps.event.addListener(starbucksMap,'click',function(){
+        alert("여기는 스타벅스입니다");
+    });
+    google.maps.event.addListener(kfcMap,'click',function(){
+        alert("여기는 kfc입니다");
+    });
+}
+function handleNoGeolocation(errorFlag) {
+  if (errorFlag) {
+    var content = 'Error: The Geolocation service failed.';
+  } else {
+    var content = 'Error: Your browser doesn\'t support geolocation.';
+  }
+  var options = {
+    map: map,
+    position: new google.maps.LatLng(35, 125),
+    content: content
+  };
+  var infowindow = new google.maps.InfoWindow(options);
+  map.setCenter(options.position);
+}
+function codeAddress() {    //for  Geocoding
+
+  var address = document.getElementById('address').value;
+  geocoder.geocode( { 'address': address}, function(results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+      map.setCenter(results[0].geometry.location);
+      var marker2 = new google.maps.Marker({
+          map: map,
+          position: results[0].geometry.location
+      });
+      var infowindow=new google.maps.InfoWindow({
+          map:map,
+          position: results[0].geometry.location,
+          content:address
+      });
+      var string = "" + results[0].geometry.location.lat() + " "+results[0].geometry.location.lng();
+      document.getElementById("latlang").value = string;
+      infowindow.open(map,marker2);
+    } else {
+      alert('Geocode was not successful for the following reason: ' + status);
+    }
+  });
+}
+
+function setMessage(arg) {
+
+        document.getElementById("address").value = arg;
+
+	}
+	function sendMessage(msg){
+
+		window.android.setMessage(msg);
+
+	}
+google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+</head>
+<body>
+<div id="panel">
+<input id="address" type="textbox" value="서울특별시 마포구 신수동 1-1">
+<input type="button" value="Go!!" onclick="codeAddress()">
+<input id="latlang" type="textbox" value = "1">
+<input type="button" value="Send" onclick="sendMessage(document.getElementById('latlang').value)">
+</div>
+<div id="map-canvas"></div>
+</body>
+</html>
